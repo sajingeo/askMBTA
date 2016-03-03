@@ -1,0 +1,9 @@
+WhatsMyNextBusIntent when is my next bus
+WhatsMyNextBusIntent what time is the next bus
+WhatsMyNextBusIntent what time is next bus
+WhatsMyNextBusIntent next bus
+WhatsMyNextBusIntent when is the bus
+WhatsMyNextBusIntent when is the next bus
+SetMYIDIntent my stop id is {StopId}
+SetMYIDIntent my stop is {StopId}
+SetMYIDIntent my stop {StopId}
