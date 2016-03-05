@@ -1,16 +1,17 @@
 {
   "intents": [
     {
-      "intent": "SetMYIDIntent",
+      "intent": "findNextBusIntent",
       "slots": [
         {
           "name": "StopId",
           "type": "AMAZON.NUMBER"
+        },
+        {
+          "name": "routeId",
+          "type": "AMAZON.NUMBER"
         }
       ]
-    },
-    {
-      "intent": "WhatsMyNextBusIntent"
     },
     {
       "intent": "AMAZON.HelpIntent"

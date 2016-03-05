@@ -1,9 +1,10 @@
-WhatsMyNextBusIntent when is my next bus
-WhatsMyNextBusIntent what time is the next bus
-WhatsMyNextBusIntent what time is next bus
-WhatsMyNextBusIntent next bus
-WhatsMyNextBusIntent when is the bus
-WhatsMyNextBusIntent when is the next bus
-SetMYIDIntent my stop id is {StopId}
-SetMYIDIntent my stop is {StopId}
-SetMYIDIntent my stop {StopId}
+findNextBusIntent my stop id is {StopId} and route number is {routeId}
+findNextBusIntent my stop is {StopId} and route is {routeId}
+findNextBusIntent my stop number is {StopId} and route is {routeId}
+findNextBusIntent my stop id is {StopId} and route is {routeId}
+findNextBusIntent my stop number is {StopId} and route number is {routeId}
+findNextBusIntent stop {StopId} and route {routeId}
+findNextBusIntent my route is {routeId} and my stop is {StopId}
+findNextBusIntent my route id is {routeId} and my stop id is {StopId}
+findNextBusIntent my route number is {routeId} and my stop id is {StopId}
+findNextBusIntent my route number is {routeId} and my stop number is {StopId}

@@ -8,7 +8,10 @@ http://amzn.to/1LGWsLG
 """
 
 from __future__ import print_function
-
+import requests
+import time
+import datetime
+import pytz
 
 def lambda_handler(event, context):
     """ Route the incoming request based on type (LaunchRequest, IntentRequest,
@@ -66,10 +69,8 @@ def on_intent(intent_request, session):
     intent_name = intent_request['intent']['name']
 
     # Dispatch to your skill's intent handlers
-    if intent_name == "SetMYIDIntent":
-        return save_stop_id(intent,session)
-    elif intent_name == "WhatsMyNextBusIntent":
-        return find_next_bus(intent, session)
+    if intent_name == "findNextBusIntent":
+        return find_next_bus(intent,session)
     elif intent_name == "AMAZON.HelpIntent":
         return get_welcome_response()
     else:
@@ -83,10 +84,8 @@ def on_session_ended(session_ended_request, session):
     """
     print("on_session_ended requestId=" + session_ended_request['requestId'] +
           ", sessionId=" + session['sessionId'])
-    # add cleanup logic here
 
 # --------------- Functions that control the skill's behavior ------------------
-
 
 def get_welcome_response():
     """ If we wanted to initialize the session to have some attributes we could
@@ -94,66 +93,53 @@ def get_welcome_response():
     """
 
     session_attributes = {}
-    card_title = "Welcome"
-    speech_output = "Welcome to the Alexa Massachusetts Bay Transportation Authority next bus app " \
-                    "Please tell me your stop ID, " \
-                    "my stop id is 314"
+    card_title = "Welcome to MBTA next bus app"
+    speech_output = "Welcome to the Alexa MBTA next bus app " \
+                    "Please tell me your stop eye d, and route number." \
+                    "For example my stop eye D is one four one nine and route number is sixty nine"
+    card_text = "Welcome to the Alexa MBTA next bus app " \
+                "Please tell me your stop ID, and route number." \
+                "For example my stop ID is 1419 and route number is 69"
     # If the user either does not reply to the welcome message or says something
     # that is not understood, they will be prompted again with this text.
-    reprompt_text = "Please tell me your stop ID, " \
-                    "my stop id is 314."
+    reprompt_text = "Please tell me your stop I D, and route number." \
+                    "my stop eye D is one four one nine. and router number is 69"
     should_end_session = False
     return build_response(session_attributes, build_speechlet_response(
-        card_title, speech_output, reprompt_text, should_end_session))
+        card_title, speech_output, reprompt_text, card_text, should_end_session))
 
-def save_stop_id(intent, session):
+def find_next_bus(intent, session):
     """ sets stop id into session"""
 
     card_title = intent['name']
     session_attributes = {}
-    should_end_session = False
 
     if 'StopId' in intent['slots']:
         myStopID = intent['slots']['StopId']['value']
-        session_attributes = create_stop_id_attributes(myStopID)
-        speech_output = "your stop id is set to"+myStopID
-        
-        reprompt_text = "You can ask me what is the next bus at your stop ID." \
-                        "My stop id is 314"
-    else:
-        speech_output = "I'm not sure what your stop ID is. " \
+        if 'routeId' in intent['slots']:
+            myRouteId = intent['slots']['routeId']['value']
+            
+            speech_output = seach_mbta(myStopID,myRouteId)
+            reprompt_text = None
+        else:
+            speech_output = "I'm not sure what your route number is. " \
                         "Please try again."
-        reprompt_text = "I'm not sure what your stop id is. " \
-                        "You can tell me your stop id, " \
-                        "my stop id is 314."
-    return build_response(session_attributes, build_speechlet_response(
-        card_title, speech_output, reprompt_text, should_end_session))
-
-def create_stop_id_attributes(stop_id):
-    return {"StopId": stop_id}
-
-def find_next_bus(intent, session):
-    session_attributes = {}
-    reprompt_text = None
-
-    if "StopId" in session.get('attributes', {}):
-        stop_id = session['attributes']['StopId']
-        speech_output = "Your stop id is" + stop_id + ". The next bus at your stop is 89 in 5 minutes"
-        should_end_session = True
+            reprompt_text = "I'm not sure what your route eye D is. " \
+                        "You can tell me your stop eye D and route number, " \
+                        "my stop eye D is one four one nine. and route number is 69"
     else:
-        speech_output = "I'm not sure what your stop id is. " \
-                        "You can say, my stop id is 314."
-        should_end_session = False
+        speech_output = "I'm not sure what your stop I D is. " \
+                        "Please try again."
+        reprompt_text = "I'm not sure what your stop eye D is. " \
+                        "You can tell me your stop eye D and route number. " \
+                        "my stop eye D is one four one nine. and route number is 69"
+    card_text = speech_output
+    should_end_session = True
 
-    # Setting reprompt_text to None signifies that we do not want to reprompt
-    # the user. If the user does not respond or says something that is not
-    # understood, the session will end.
     return build_response(session_attributes, build_speechlet_response(
-        intent['name'], speech_output, reprompt_text, should_end_session))
-# --------------- Helpers that build all of the responses ----------------------
+        card_title, speech_output, reprompt_text, card_text,should_end_session))
 
-
-def build_speechlet_response(title, output, reprompt_text, should_end_session):
+def build_speechlet_response(title, output, reprompt_text, card_text, should_end_session):
     return {
         'outputSpeech': {
             'type': 'PlainText',
@@ -161,8 +147,8 @@ def build_speechlet_response(title, output, reprompt_text, should_end_session):
         },
         'card': {
             'type': 'Simple',
-            'title': 'SessionSpeechlet - ' + title,
-            'content': 'SessionSpeechlet - ' + output
+            'title': title,
+            'content': card_text
         },
         'reprompt': {
             'outputSpeech': {
@@ -173,6 +159,41 @@ def build_speechlet_response(title, output, reprompt_text, should_end_session):
         'shouldEndSession': should_end_session
     }
 
+def seach_mbta(stop_id,route_id):
+    API_KEY = "wX9NwuHnZU2ToO7GmGR9uw"
+    payload = {'api_key':API_KEY,'route':route_id,'format':'json'}
+    url_p_route = "http://realtime.mbta.com/developer/api/v2/predictionsbyroute"
+    r = requests.get(url_p_route, params=payload)
+    res = r.json() ## josonfy the string
+
+    #print res
+    foundStop = False
+    try:
+        for direction in res["direction"]:
+            for trip in direction["trip"]:
+                for stopOutbound in trip["stop"]:
+                    if (stopOutbound["stop_id"] == stop_id)and(foundStop == False):
+                        foundStop = True
+                        tripDirection = trip["trip_headsign"]
+                        outTime = datetime.datetime.fromtimestamp(int(stopOutbound["sch_arr_dt"]),pytz.UTC)
+        if foundStop == False:
+            return "Sorry please try another stop"
+
+        timeNow = datetime.datetime.now(pytz.utc)
+
+        if (outTime > timeNow):
+            time_diff = outTime - timeNow
+            minutesForNextBus = (time_diff.seconds//60)%60
+        else:
+            return "Sorry please try later"
+
+        outString = "The next " + route_id +" bus towards "+ tripDirection + " will arrive at stop " +stop_id+ " in "+ str(minutesForNextBus) + " Minutes"
+
+        return outString
+    except:
+        print 
+        return "sorry please try another stop I D and route"
+    
 
 def build_response(session_attributes, speechlet_response):
     return {
