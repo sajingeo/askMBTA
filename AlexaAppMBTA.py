@@ -115,7 +115,7 @@ def find_next_bus(intent, session):
     session_attributes = {}
 
     if 'StopId' in intent['slots']:
-        myStopID = intent['slots']['StopId']['value']
+        myStopID = int(intent['slots']['StopId']['value'])
         if 'routeId' in intent['slots']:
             myRouteId = intent['slots']['routeId']['value']
             
@@ -168,6 +168,7 @@ def seach_mbta(stop_id,route_id):
 
     #print res
     foundStop = False
+    stop_id  = str(stop_id)
     try:
         for direction in res["direction"]:
             for trip in direction["trip"]:
