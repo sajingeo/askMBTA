@@ -1,10 +1,7 @@
 """
-This sample demonstrates a simple skill built with the Amazon Alexa Skills Kit.
-The Intent Schema, Custom Slots, and Sample Utterances for this skill, as well
-as testing instructions are located at http://amzn.to/1LzFrj6
+search MBTA bus based on stop ID and bus route number.
+Sample "my stop id is one four one nine and stop id is sixty nine"
 
-For additional samples, visit the Alexa Skills Kit Getting Started guide at
-http://amzn.to/1LGWsLG
 """
 
 from __future__ import print_function
@@ -95,15 +92,15 @@ def get_welcome_response():
     session_attributes = {}
     card_title = "Welcome to MBTA next bus app"
     speech_output = "Welcome to the Alexa MBTA next bus app " \
-                    "Please tell me your stop eye d, and route number." \
-                    "For example my stop eye D is one four one nine and route number is sixty nine"
+                    "Please tell me your stop I D, and route number " \
+                    "For example my stop I D is one four one nine and route number is sixty nine"
     card_text = "Welcome to the Alexa MBTA next bus app " \
                 "Please tell me your stop ID, and route number." \
                 "For example my stop ID is 1419 and route number is 69"
     # If the user either does not reply to the welcome message or says something
     # that is not understood, they will be prompted again with this text.
     reprompt_text = "Please tell me your stop I D, and route number." \
-                    "my stop eye D is one four one nine. and router number is 69"
+                    "my stop I D is one four one nine. and router number is 69"
     should_end_session = False
     return build_response(session_attributes, build_speechlet_response(
         card_title, speech_output, reprompt_text, card_text, should_end_session))
@@ -124,15 +121,15 @@ def find_next_bus(intent, session):
         else:
             speech_output = "I'm not sure what your route number is. " \
                         "Please try again."
-            reprompt_text = "I'm not sure what your route eye D is. " \
-                        "You can tell me your stop eye D and route number, " \
-                        "my stop eye D is one four one nine. and route number is 69"
+            reprompt_text = "I'm not sure what your route I D is. " \
+                        "You can tell me your stop I D and route number, " \
+                        "my stop I D is one four one nine. and route number is 69"
     else:
         speech_output = "I'm not sure what your stop I D is. " \
                         "Please try again."
-        reprompt_text = "I'm not sure what your stop eye D is. " \
-                        "You can tell me your stop eye D and route number. " \
-                        "my stop eye D is one four one nine. and route number is 69"
+        reprompt_text = "I'm not sure what your stop I D is. " \
+                        "You can tell me your stop I D and route number. " \
+                        "my stop I D is one four one nine. and route number is 69"
     card_text = speech_output
     should_end_session = True
 
@@ -147,7 +144,7 @@ def build_speechlet_response(title, output, reprompt_text, card_text, should_end
         },
         'card': {
             'type': 'Simple',
-            'title': title,
+            'title': 'MBTA next bus app',
             'content': card_text
         },
         'reprompt': {
