@@ -167,20 +167,22 @@ def seach_mbta(stop_id,route_id):
     foundStop = False
     stop_id  = str(stop_id)
     try:
+        timeNow = datetime.datetime.now(pytz.utc)
         for direction in res["direction"]:
             for trip in direction["trip"]:
                 for stopOutbound in trip["stop"]:
-                    if (stopOutbound["stop_id"] == stop_id)and(foundStop == False):
+                    outTime = datetime.datetime.fromtimestamp(int(stopOutbound["sch_arr_dt"]),pytz.UTC)
+                    if (stopOutbound["stop_id"] == stop_id)and(foundStop == False)and(outTime >= timeNow):
                         foundStop = True
                         tripDirection = trip["trip_headsign"]
-                        outTime = datetime.datetime.fromtimestamp(int(stopOutbound["sch_arr_dt"]),pytz.UTC)
+                        outTimeFound = datetime.datetime.fromtimestamp(int(stopOutbound["sch_arr_dt"]),pytz.UTC)
         if foundStop == False:
             return "Sorry please try another stop"
 
         timeNow = datetime.datetime.now(pytz.utc)
 
-        if (outTime > timeNow):
-            time_diff = outTime - timeNow
+        if (outTimeFound >= timeNow):
+            time_diff = outTimeFound - timeNow
             minutesForNextBus = (time_diff.seconds//60)%60
         else:
             return "Sorry please try later"
