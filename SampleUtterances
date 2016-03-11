@@ -4,7 +4,21 @@ findNextBusIntent my stop number is {StopId} and route is {routeId}
 findNextBusIntent my stop id is {StopId} and route is {routeId}
 findNextBusIntent my stop number is {StopId} and route number is {routeId}
 findNextBusIntent stop {StopId} and route {routeId}
+findNextBusIntent stop {StopId} and bus {routeId}
+findNextBusIntent stop {StopId} and bus number {routeId}
 findNextBusIntent my route is {routeId} and my stop is {StopId}
 findNextBusIntent my route id is {routeId} and my stop id is {StopId}
 findNextBusIntent my route number is {routeId} and my stop id is {StopId}
 findNextBusIntent my route number is {routeId} and my stop number is {StopId}
+findNextBusIntent my bus number is {routeId} and my stop number is {StopId}
+findNextBusIntent my bus number is {routeId} and my stop i d is {StopId}
+findNextBusIntent my bus number is {routeId} and my stop id is {StopId}
+findNextBusIntent my stop id is {StopId} and bus number is {routeId}
+findNextBusIntent stop id {StopId} and bus number {routeId}
+findNextBusIntent stop id {StopId} bus number {routeId}
+findNextBusIntent my stop is {StopId} and bus number is {routeId}
+findNextBusIntent my stop is {StopId} and bus is {routeId}
+findNextBusIntent my stop {StopId} and bus {routeId}
+findNextBusIntent my bus {routeId} and stop {StopId}
+findNextBusIntent bus {routeId} and stop {StopId}
+findNextBusIntent bus {routeId} stop {StopId}

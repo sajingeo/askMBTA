@@ -16,5 +16,66 @@
     {
       "intent": "AMAZON.HelpIntent"
     }
+    {
+      "intent": "AMAZON.StopIntent"
+    }
   ]
+}
+
+
+
+test//
+{
+  "session": {
+    "new": false,
+    "sessionId": "session1234",
+    "attributes": {},
+    "user": {
+      "userId": null
+    },
+    "application": {
+      "applicationId": "amzn1.echo-sdk-ams.app.[unique-value-here]"
+    }
+  },
+  "version": "1.0",
+  "request": {
+    "intent": {
+      "slots": {
+        "StopId": {
+          "name": "StopId",
+          "value": "1419"
+        },
+        "routeId": {
+          "name": "routeId",
+          "value": "69"
+        }
+      },
+      "name": "findNextBusIntent"
+    },
+    "type": "IntentRequest",
+    "requestId": "request5678"
+  }
+}
+
+
+{
+  "session": {
+    "new": false,
+    "sessionId": "session1234",
+    "attributes": {},
+    "user": {
+      "userId": null
+    },
+    "application": {
+      "applicationId": "amzn1.echo-sdk-ams.app.[unique-value-here]"
+    }
+  },
+  "version": "1.0",
+  "request": {
+    "intent": {
+      "name": "AMAZON.StopIntent"
+    },
+    "type": "IntentRequest",
+    "requestId": "request5678"
+  }
 }

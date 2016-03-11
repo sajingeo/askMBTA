@@ -71,7 +71,7 @@ def on_intent(intent_request, session):
     elif intent_name == "AMAZON.HelpIntent":
         return get_welcome_response()
     else:
-        raise ValueError("Invalid intent")
+        return stopSession()
 
 
 def on_session_ended(session_ended_request, session):
@@ -92,14 +92,14 @@ def get_welcome_response():
     session_attributes = {}
     card_title = "Welcome to MBTA next bus app"
     speech_output = "Welcome to the Alexa MBTA next bus app " \
-                    "Please tell me your stop I D, and route number " \
+                    "Please tell me your stop I D and route number " \
                     "For example my stop I D is one four one nine and route number is sixty nine"
     card_text = "Welcome to the Alexa MBTA next bus app " \
                 "Please tell me your stop ID, and route number." \
                 "For example my stop ID is 1419 and route number is 69"
     # If the user either does not reply to the welcome message or says something
     # that is not understood, they will be prompted again with this text.
-    reprompt_text = "Please tell me your stop I D, and route number." \
+    reprompt_text = "Please tell me your stop I. D. and route number." \
                     "my stop I D is one four one nine. and router number is 69"
     should_end_session = False
     return build_response(session_attributes, build_speechlet_response(
@@ -157,7 +157,7 @@ def build_speechlet_response(title, output, reprompt_text, card_text, should_end
     }
 
 def seach_mbta(stop_id,route_id):
-    API_KEY = "wX9NwuHnZU2ToO7GmGR9uw"
+    API_KEY = "xg1SBURh8E2jSaFX0gOeLw"
     payload = {'api_key':API_KEY,'route':route_id,'format':'json'}
     url_p_route = "http://realtime.mbta.com/developer/api/v2/predictionsbyroute"
     r = requests.get(url_p_route, params=payload)
@@ -193,7 +193,16 @@ def seach_mbta(stop_id,route_id):
     except:
         print 
         return "sorry please try another stop I D and route"
-    
+
+def stopSession():
+    session_attributes = {}
+    card_title = "Welcome to MBTA next bus app"
+    speech_output = "Good Bye !!"
+    card_text = "Good Bye !!"
+    reprompt_text = "Good Bye !!"
+    should_end_session = True
+    return build_response(session_attributes, build_speechlet_response(
+        card_title, speech_output, reprompt_text, card_text, should_end_session))
 
 def build_response(session_attributes, speechlet_response):
     return {
