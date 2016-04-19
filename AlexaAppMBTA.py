@@ -69,6 +69,8 @@ def on_intent(intent_request, session):
     if intent_name == "findNextBusIntent":
         return find_next_bus(intent,session)
     elif intent_name == "AMAZON.HelpIntent":
+        return get_help_response()
+    elif ((intent_name == "AMAZON.StartOverIntent") or (intent_name == "AMAZON.RepeatIntent")):
         return get_welcome_response()
     else:
         return stopSession()
@@ -91,16 +93,43 @@ def get_welcome_response():
 
     session_attributes = {}
     card_title = "Welcome to MBTA next bus app"
-    speech_output = "Welcome to the Alexa MBTA next bus app " \
-                    "Please tell me your stop I D and route number " \
-                    "For example my stop I D is one four one nine and route number is sixty nine"
+    speech_output = "Welcome to the Alexa MBTA next bus app. " \
+                    "Please tell me your stop I D and route number, " \
+                    "For example my stop I D is one four one nine and route number is sixty nine. "
     card_text = "Welcome to the Alexa MBTA next bus app " \
-                "Please tell me your stop ID, and route number." \
-                "For example my stop ID is 1419 and route number is 69"
+                "Please tell me your stop ID, and route number. " \
+                "For example my stop ID is 1419 and route number is 69 "
     # If the user either does not reply to the welcome message or says something
     # that is not understood, they will be prompted again with this text.
-    reprompt_text = "Please tell me your stop I. D. and route number." \
-                    "my stop I D is one four one nine. and router number is 69"
+    reprompt_text = "Please tell me your stop I. D. and route number. " \
+                    "my stop I D is one four one nine. and route number is 69. "
+    should_end_session = False
+    return build_response(session_attributes, build_speechlet_response(
+        card_title, speech_output, reprompt_text, card_text, should_end_session))
+
+def get_help_response():
+    """ Print/Say help text
+    """
+
+    session_attributes = {}
+    card_title = "MBTA next bus app HELP"
+    speech_output = "With the MBTA next bus app you can find when the next bus would arrive. " \
+                    "To use the app you should know the STOP I D and Route Number. " \
+                    "The route number is usually the bus number, and stop I D can be found on the M. B. T. A. Bus Stop Sign. " \
+                    "The stop I D can also be found online from the M. B. T. A. website. " \
+                    "Can you please tell me your stop I D and bus number ? "
+    card_text = "With the MBTA next bus app you can find when the next bus would arrive.  " \
+                "To use the app you should know the STOP ID and Route Number. " \
+                "The route number is usually the bus number, and stop ID can be found on the MBTA Bus Stop Sign. " \
+                "You can also find the STOP ID at http://www.mbta.com/rider_tools/realtime_bus/. " \
+                "You can tigger the app by saying Alexa, ask M. B. T. A"
+    # If the user either does not reply to the welcome message or says something
+    # that is not understood, they will be prompted again with this text.
+    reprompt_text = "With the MBTA next bus app you can find when the next bus would arrive. " \
+                    "To use the app you should know the STOP I D and Route Number. " \
+                    "The route number is usually the bus number, and stop I D can be found on the M. B. T. A. Bus Stop Sign. " \
+                    "The stop I D can also be found online from the M. B. T. A. website. " \
+                    "Can you please tell me your stop I D and bus number ?"
     should_end_session = False
     return build_response(session_attributes, build_speechlet_response(
         card_title, speech_output, reprompt_text, card_text, should_end_session))
@@ -108,30 +137,47 @@ def get_welcome_response():
 def find_next_bus(intent, session):
     """ sets stop id into session"""
 
-    card_title = intent['name']
+    card_title = 'MBTA next bus app'
     session_attributes = {}
+    error = False
+    try:
+        if 'StopId' in intent['slots']:
+            myStopID = int(intent['slots']['StopId']['value'])
+            if 'routeId' in intent['slots']:
+                myRouteId = intent['slots']['routeId']['value']
+                
+                speech_output = seach_mbta(myStopID,myRouteId)
+                if (speech_output == -1):
+                    error = True
+                    speech_output = "There was an erorr with the request, please try another stop id and route."
 
-    if 'StopId' in intent['slots']:
-        myStopID = int(intent['slots']['StopId']['value'])
-        if 'routeId' in intent['slots']:
-            myRouteId = intent['slots']['routeId']['value']
-            
-            speech_output = seach_mbta(myStopID,myRouteId)
-            reprompt_text = None
+                reprompt_text = None
+            else:
+                error = True
+                speech_output = "I'm not sure what your route number is. " \
+                            "Please try again. "
+                reprompt_text = "I'm not sure what your route I D is. " \
+                            "Please tell me your stop I D and route number again, "
         else:
-            speech_output = "I'm not sure what your route number is. " \
-                        "Please try again."
-            reprompt_text = "I'm not sure what your route I D is. " \
-                        "You can tell me your stop I D and route number, " \
-                        "my stop I D is one four one nine. and route number is 69"
-    else:
-        speech_output = "I'm not sure what your stop I D is. " \
-                        "Please try again."
-        reprompt_text = "I'm not sure what your stop I D is. " \
-                        "You can tell me your stop I D and route number. " \
-                        "my stop I D is one four one nine. and route number is 69"
+            erorr = True
+            speech_output = "I'm not sure what your stop I D is. " \
+                            "Please try again. "
+            reprompt_text = "I'm not sure what your stop I D is. " \
+                            "Please tell me your stop I D and route number. "
+    except:
+        erorr = True
+        speech_output = "Sorry I didn't get that. " \
+                        "Please try again. " \
+                        "You can say my stop I.D. is one four one nine, and route number is sixty nine. "
+        reprompt_text = "I'm not sure what your stop I D and Route number is. " \
+                        "Please tell me your stop I D and route number, " \
+                        "for example, my stop I D is one four one nine. and route number is 69"
     card_text = speech_output
-    should_end_session = True
+    
+    if (error == True):  ## do not close the seesion if there was an error in the request
+        should_end_session = False
+    else:
+        should_end_session = True
 
     return build_response(session_attributes, build_speechlet_response(
         card_title, speech_output, reprompt_text, card_text,should_end_session))
@@ -157,13 +203,13 @@ def build_speechlet_response(title, output, reprompt_text, card_text, should_end
     }
 
 def seach_mbta(stop_id,route_id):
-    API_KEY = "xg1SBURh8E2jSaFX0gOeLw"
+    API_KEY = "wX9NwuHnZU2ToO7GmGR9uw"
     payload = {'api_key':API_KEY,'route':route_id,'format':'json'}
     url_p_route = "http://realtime.mbta.com/developer/api/v2/predictionsbyroute"
     r = requests.get(url_p_route, params=payload)
     res = r.json() ## josonfy the string
 
-    #print res
+    #function returns -1 if there is an error
     foundStop = False
     stop_id  = str(stop_id)
     try:
@@ -177,7 +223,7 @@ def seach_mbta(stop_id,route_id):
                         tripDirection = trip["trip_headsign"]
                         outTimeFound = datetime.datetime.fromtimestamp(int(stopOutbound["sch_arr_dt"]),pytz.UTC)
         if foundStop == False:
-            return "Sorry please try another stop"
+            return -1
 
         timeNow = datetime.datetime.now(pytz.utc)
 
@@ -185,18 +231,17 @@ def seach_mbta(stop_id,route_id):
             time_diff = outTimeFound - timeNow
             minutesForNextBus = (time_diff.seconds//60)%60
         else:
-            return "Sorry please try later"
+            return -1
 
         outString = "The next " + route_id +" bus towards "+ tripDirection + " will arrive at stop " +stop_id+ " in "+ str(minutesForNextBus) + " Minutes"
 
         return outString
     except:
-        print 
-        return "sorry please try another stop I D and route"
+        return -1
 
 def stopSession():
     session_attributes = {}
-    card_title = "Welcome to MBTA next bus app"
+    card_title = "MBTA next bus app"
     speech_output = "Good Bye !!"
     card_text = "Good Bye !!"
     reprompt_text = "Good Bye !!"
