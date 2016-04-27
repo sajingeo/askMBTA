@@ -92,7 +92,7 @@ def get_welcome_response():
     """
 
     session_attributes = {}
-    card_title = "Welcome to MBTA next bus app"
+    card_title = "Next bus for MBTA"
     speech_output = "Welcome to the Alexa MBTA next bus app. " \
                     "Please tell me your stop I D and route number, " \
                     "For example my stop I D is one four one nine and route number is sixty nine. "
@@ -112,7 +112,7 @@ def get_help_response():
     """
 
     session_attributes = {}
-    card_title = "MBTA next bus app HELP"
+    card_title = "Next bus for MBTA"
     speech_output = "With the MBTA next bus app you can find when the next bus would arrive. " \
                     "To use the app you should know the STOP I D and Route Number. " \
                     "The route number is usually the bus number, and stop I D can be found on the M. B. T. A. Bus Stop Sign. " \
@@ -137,7 +137,7 @@ def get_help_response():
 def find_next_bus(intent, session):
     """ sets stop id into session"""
 
-    card_title = 'MBTA next bus app'
+    card_title = 'Next bus for MBTA'
     session_attributes = {}
     error = False
     try:
@@ -149,7 +149,7 @@ def find_next_bus(intent, session):
                 speech_output = seach_mbta(myStopID,myRouteId)
                 if (speech_output == -1):
                     error = True
-                    speech_output = "There was an erorr with the request, please try another stop id and route."
+                    speech_output = "There was an error with the request, please try another stop id and route."
 
                 reprompt_text = None
             else:
@@ -159,13 +159,13 @@ def find_next_bus(intent, session):
                 reprompt_text = "I'm not sure what your route I D is. " \
                             "Please tell me your stop I D and route number again, "
         else:
-            erorr = True
+            error = True
             speech_output = "I'm not sure what your stop I D is. " \
                             "Please try again. "
             reprompt_text = "I'm not sure what your stop I D is. " \
                             "Please tell me your stop I D and route number. "
     except:
-        erorr = True
+        error = True
         speech_output = "Sorry I didn't get that. " \
                         "Please try again. " \
                         "You can say my stop I.D. is one four one nine, and route number is sixty nine. "
@@ -241,7 +241,7 @@ def seach_mbta(stop_id,route_id):
 
 def stopSession():
     session_attributes = {}
-    card_title = "MBTA next bus app"
+    card_title = "Next bus for MBTA"
     speech_output = "Good Bye !!"
     card_text = "Good Bye !!"
     reprompt_text = "Good Bye !!"
