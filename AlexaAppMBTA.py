@@ -93,10 +93,10 @@ def get_welcome_response():
 
     session_attributes = {}
     card_title = "Next bus for MBTA"
-    speech_output = "Welcome to the Alexa MBTA next bus app. " \
+    speech_output = "Welcome to the Alexa Next bus for M. B. T. A. app. " \
                     "Please tell me your stop I D and route number, " \
                     "For example my stop I D is one four one nine and route number is sixty nine. "
-    card_text = "Welcome to the Alexa MBTA next bus app " \
+    card_text = "Welcome to the Alexa Next bus for MBTA app " \
                 "Please tell me your stop ID, and route number. " \
                 "For example my stop ID is 1419 and route number is 69 "
     # If the user either does not reply to the welcome message or says something
@@ -113,19 +113,19 @@ def get_help_response():
 
     session_attributes = {}
     card_title = "Next bus for MBTA"
-    speech_output = "With the MBTA next bus app you can find when the next bus would arrive. " \
+    speech_output = "With the Next bus for M. B. T. A. app you can find when the next bus would arrive. " \
                     "To use the app you should know the STOP I D and Route Number. " \
                     "The route number is usually the bus number, and stop I D can be found on the M. B. T. A. Bus Stop Sign. " \
                     "The stop I D can also be found online from the M. B. T. A. website. " \
                     "Can you please tell me your stop I D and bus number ? "
-    card_text = "With the MBTA next bus app you can find when the next bus would arrive.  " \
+    card_text = "With the Next bus for MBTA app you can find when the next bus would arrive.  " \
                 "To use the app you should know the STOP ID and Route Number. " \
                 "The route number is usually the bus number, and stop ID can be found on the MBTA Bus Stop Sign. " \
                 "You can also find the STOP ID at http://www.mbta.com/rider_tools/realtime_bus/. " \
                 "You can tigger the app by saying Alexa, ask M. B. T. A"
     # If the user either does not reply to the welcome message or says something
     # that is not understood, they will be prompted again with this text.
-    reprompt_text = "With the MBTA next bus app you can find when the next bus would arrive. " \
+    reprompt_text = "With the Next bus for M. B. T. A. app you can find when the next bus would arrive. " \
                     "To use the app you should know the STOP I D and Route Number. " \
                     "The route number is usually the bus number, and stop I D can be found on the M. B. T. A. Bus Stop Sign. " \
                     "The stop I D can also be found online from the M. B. T. A. website. " \
@@ -190,7 +190,7 @@ def build_speechlet_response(title, output, reprompt_text, card_text, should_end
         },
         'card': {
             'type': 'Simple',
-            'title': 'MBTA next bus app',
+            'title': 'Next bus for MBTA',
             'content': card_text
         },
         'reprompt': {
