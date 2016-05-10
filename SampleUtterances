@@ -22,3 +22,20 @@ findNextBusIntent my stop {StopId} and bus {routeId}
 findNextBusIntent my bus {routeId} and stop {StopId}
 findNextBusIntent bus {routeId} and stop {StopId}
 findNextBusIntent bus {routeId} stop {StopId}
+findNextBusIntent is the next {routeId} bus at stop {StopId}
+findNextBusIntent when is the next {routeId} bus at stop {StopId}
+findNextBusIntent when is the next bus {routeId} at stop {StopId}
+findNextBusIntent when is the next bus {routeId} at {StopId}
+findNextBusIntent when is the next bus {routeId} at {StopId} stop
+findNextBusIntent what time is the next {routeId} bus at stop {StopId}
+findNextBusIntent what time is the next bus {routeId} at stop {StopId}
+findNextBusIntent what time is the next bus {routeId} at {StopId}
+findNextBusIntent what time is the next bus {routeId} at {StopId} stop
+findNextBusIntent when will the next {routeId} bus at {StopId} stop
+findNextBusIntent when will the next {routeId} bus arrive at stop {StopId}
+findNextBusIntent when will the next {routeId} bus arrive at {StopId}
+findNextBusIntent when the next {routeId} bus will arrive at {StopId}
+findNextBusIntent when will the next {routeId} bus will arrive at {StopId}
+findNextBusIntent when will the next {routeId} bus will arrive at stop {StopId}
+findNextBusIntent when the next {routeId} bus will reach at stop {StopId}
+findNextBusIntent when the next {routeId} bus at stop {StopId}

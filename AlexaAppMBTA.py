@@ -92,17 +92,17 @@ def get_welcome_response():
     """
 
     session_attributes = {}
-    card_title = "Next bus for MBTA"
-    speech_output = "Welcome to the Alexa Next bus for M. B. T. A. app. " \
+    card_title = "Boston T-time"
+    speech_output = "Welcome to the boston T. time. " \
                     "Please tell me your stop I D and route number, " \
-                    "For example my stop I D is one four one nine and route number is sixty nine. "
-    card_text = "Welcome to the Alexa Next bus for MBTA app " \
+                    "For example my stop I D is one four one nine and route number is sixty nine. You can also say ask boston t. time when is the next 69 bus at stop 1419. "
+    card_text = "Welcome to the Boston T-time" \
                 "Please tell me your stop ID, and route number. " \
-                "For example my stop ID is 1419 and route number is 69 "
+                "For example \"my stop ID is 1419 and route number is 69\". You can also say \" ask boston T-time when is the next 69 bus at stop 1419."
     # If the user either does not reply to the welcome message or says something
     # that is not understood, they will be prompted again with this text.
     reprompt_text = "Please tell me your stop I. D. and route number. " \
-                    "my stop I D is one four one nine. and route number is 69. "
+                    "my stop I. D. is one four one nine. and route number is 69. "
     should_end_session = False
     return build_response(session_attributes, build_speechlet_response(
         card_title, speech_output, reprompt_text, card_text, should_end_session))
@@ -112,23 +112,23 @@ def get_help_response():
     """
 
     session_attributes = {}
-    card_title = "Next bus for MBTA"
-    speech_output = "With the Next bus for M. B. T. A. app you can find when the next bus would arrive. " \
+    card_title = "Boston T-time"
+    speech_output = "With the Boston T. time app you can find when the next bus would arrive at your stop. " \
                     "To use the app you should know the STOP I D and Route Number. " \
                     "The route number is usually the bus number, and stop I D can be found on the M. B. T. A. Bus Stop Sign. " \
                     "The stop I D can also be found online from the M. B. T. A. website. " \
                     "Can you please tell me your stop I D and bus number ? "
-    card_text = "With the Next bus for MBTA app you can find when the next bus would arrive.  " \
+    card_text = "With the Boston T-time app you can find when the next bus would arrive at your stop.  " \
                 "To use the app you should know the STOP ID and Route Number. " \
                 "The route number is usually the bus number, and stop ID can be found on the MBTA Bus Stop Sign. " \
                 "You can also find the STOP ID at http://www.mbta.com/rider_tools/realtime_bus/. " \
-                "You can tigger the app by saying Alexa, ask M. B. T. A"
+                "You can tigger the app by saying Alexa, ask Boston T-time. "
     # If the user either does not reply to the welcome message or says something
     # that is not understood, they will be prompted again with this text.
-    reprompt_text = "With the Next bus for M. B. T. A. app you can find when the next bus would arrive. " \
+    reprompt_text = "With the Boston T. time app you can find when the next bus would arrive at your stop. " \
                     "To use the app you should know the STOP I D and Route Number. " \
                     "The route number is usually the bus number, and stop I D can be found on the M. B. T. A. Bus Stop Sign. " \
-                    "The stop I D can also be found online from the M. B. T. A. website. " \
+                    "The stop I D can also be found online from the M. B. T. A. website. You can check the alexa app for a link. " \
                     "Can you please tell me your stop I D and bus number ?"
     should_end_session = False
     return build_response(session_attributes, build_speechlet_response(
@@ -137,7 +137,7 @@ def get_help_response():
 def find_next_bus(intent, session):
     """ sets stop id into session"""
 
-    card_title = 'Next bus for MBTA'
+    card_title = "Boston T-time"
     session_attributes = {}
     error = False
     try:
@@ -190,7 +190,7 @@ def build_speechlet_response(title, output, reprompt_text, card_text, should_end
         },
         'card': {
             'type': 'Simple',
-            'title': 'Next bus for MBTA',
+            'title': 'Boston T-time',
             'content': card_text
         },
         'reprompt': {
@@ -208,7 +208,7 @@ def seach_mbta(stop_id,route_id):
     url_p_route = "http://realtime.mbta.com/developer/api/v2/predictionsbyroute"
     r = requests.get(url_p_route, params=payload)
     res = r.json() ## josonfy the string
-
+    print (res) ## this is for logging and should not released!!
     #function returns -1 if there is an error
     foundStop = False
     stop_id  = str(stop_id)
@@ -241,7 +241,7 @@ def seach_mbta(stop_id,route_id):
 
 def stopSession():
     session_attributes = {}
-    card_title = "Next bus for MBTA"
+    card_title = "Boston T-time"
     speech_output = "Good Bye !!"
     card_text = "Good Bye !!"
     reprompt_text = "Good Bye !!"
