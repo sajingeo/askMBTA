@@ -95,10 +95,11 @@ def get_welcome_response():
     card_title = "Boston T-time"
     speech_output = "Welcome to the boston T. time. " \
                     "Please tell me your stop I D and route number, " \
-                    "For example my stop I D is one four one nine and route number is sixty nine. You can also say ask boston t. time when is the next 69 bus at stop 1419. "
+                    "For example my stop I D is one four one nine and route number is sixty nine. You can also say ask boston t. time when is the next 69 bus at stop one four one nine. "
     card_text = "Welcome to the Boston T-time" \
                 "Please tell me your stop ID, and route number. " \
-                "For example \"my stop ID is 1419 and route number is 69\". You can also say \" ask boston T-time when is the next 69 bus at stop 1419."
+                "For example \"my stop ID is 1419 and route number is 69\". You can also say \" ask boston T-time when is the next 69 bus at stop 1419." \
+                "You can also find the STOP ID at https://mbtasearch.herokuapp.com/. "
     # If the user either does not reply to the welcome message or says something
     # that is not understood, they will be prompted again with this text.
     reprompt_text = "Please tell me your stop I. D. and route number. " \
@@ -121,14 +122,14 @@ def get_help_response():
     card_text = "With the Boston T-time app you can find when the next bus would arrive at your stop.  " \
                 "To use the app you should know the STOP ID and Route Number. " \
                 "The route number is usually the bus number, and stop ID can be found on the MBTA Bus Stop Sign. " \
-                "You can also find the STOP ID at http://www.mbta.com/rider_tools/realtime_bus/. " \
+                "You can also find the STOP ID at https://mbtasearch.herokuapp.com/. " \
                 "You can tigger the app by saying Alexa, ask Boston T-time. "
     # If the user either does not reply to the welcome message or says something
     # that is not understood, they will be prompted again with this text.
     reprompt_text = "With the Boston T. time app you can find when the next bus would arrive at your stop. " \
                     "To use the app you should know the STOP I D and Route Number. " \
                     "The route number is usually the bus number, and stop I D can be found on the M. B. T. A. Bus Stop Sign. " \
-                    "The stop I D can also be found online from the M. B. T. A. website. You can check the alexa app for a link. " \
+                    "You can check the alexa app for a link, to lookup the stop ID." \
                     "Can you please tell me your stop I D and bus number ?"
     should_end_session = False
     return build_response(session_attributes, build_speechlet_response(
@@ -171,8 +172,8 @@ def find_next_bus(intent, session):
                         "You can say my stop I.D. is one four one nine, and route number is sixty nine. "
         reprompt_text = "I'm not sure what your stop I D and Route number is. " \
                         "Please tell me your stop I D and route number, " \
-                        "for example, my stop I D is one four one nine. and route number is 69"
-    card_text = speech_output
+                        "for example, my stop I D is one four one nine. and route number is 69."
+    card_text = speech_output +"Find out your stop id at https://mbtasearch.herokuapp.com/ "
     
     if (error == True):  ## do not close the seesion if there was an error in the request
         should_end_session = False
@@ -202,16 +203,67 @@ def build_speechlet_response(title, output, reprompt_text, card_text, should_end
         'shouldEndSession': should_end_session
     }
 
-def seach_mbta(stop_id,route_id):
-    API_KEY = "wX9NwuHnZU2ToO7GmGR9uw"
+def seach_mbta(stop_id,route_id_str):
+    try:
+        route_id = int (route_id_str)
+    except:
+        if (route_id_str == "CT1"):
+            route_id = 701
+        elif (route_id_str == "CT2"):
+            route_id = 747
+        elif (route_id_str == "CT3"):
+            route_id = 708
+        elif (route_id_str == "SL1"):
+            route_id = 741
+        elif (route_id_str == "SL2"):
+            route_id = 742
+        elif (route_id_str == "SL4"):
+            route_id = 751
+        elif (route_id_str == "SL5"):
+            route_id = 749
+        elif (route_id_str == "Waterfront"):
+            route_id = 746
+        elif (route_id_str == "24/27"):
+            route_id = 2427
+        elif (route_id_str == "32/33"):
+            route_id = 3233
+        elif (route_id_str == "37/38"):
+            route_id = 3738
+        elif (route_id_str == "40/50"):
+            route_id = 4050
+        elif (route_id_str == "62/76"):
+            route_id = 6276
+        elif (route_id_str == "72/75"):
+            route_id = 7275
+        elif (route_id_str == "89/93"):
+            route_id = 8993
+        elif (route_id_str == "116/117"):
+            route_id = 116117
+        elif (route_id_str == "214/216"):
+            route_id = 214216
+        elif (route_id_str == "441/442"):
+            route_id = 441442
+        elif (route_id_str == "34E"):
+            route_id = "34E"
+        elif (route_id_str == "57A"):
+            route_id = "57A"
+        elif (route_id_str == "70A"):
+            route_id = "70A"
+        elif (route_id_str == "24/27"):
+            route_id = 2427
+
+    API_KEY = "xxxxxxxxxxxxxxxxxxxxxx"
     payload = {'api_key':API_KEY,'route':route_id,'format':'json'}
     url_p_route = "http://realtime.mbta.com/developer/api/v2/predictionsbyroute"
+    # print (payload)
     r = requests.get(url_p_route, params=payload)
     res = r.json() ## josonfy the string
-    print (res) ## this is for logging and should not released!!
+    #print (res) ## this is for logging and should not released!!
     #function returns -1 if there is an error
     foundStop = False
     stop_id  = str(stop_id)
+
+    # print (res)
     try:
         timeNow = datetime.datetime.now(pytz.utc)
         for direction in res["direction"]:
@@ -223,20 +275,23 @@ def seach_mbta(stop_id,route_id):
                         tripDirection = trip["trip_headsign"]
                         outTimeFound = datetime.datetime.fromtimestamp(int(stopOutbound["sch_arr_dt"]),pytz.UTC)
         if foundStop == False:
+            print ("stop not found")
             return -1
-
+    
         timeNow = datetime.datetime.now(pytz.utc)
-
+    
         if (outTimeFound >= timeNow):
             time_diff = outTimeFound - timeNow
             minutesForNextBus = (time_diff.seconds//60)%60
         else:
+            print ("time not found")
             return -1
-
-        outString = "The next " + route_id +" bus towards "+ tripDirection + " will arrive at stop " +stop_id+ " in "+ str(minutesForNextBus) + " Minutes"
-
+    
+        outString = "The next " + route_id_str +" bus towards "+ tripDirection + " will arrive at stop " +stop_id+ " in "+ str(minutesForNextBus) + " Minutes "
+        # print (outString)
         return outString
     except:
+        print ("some other error")
         return -1
 
 def stopSession():
