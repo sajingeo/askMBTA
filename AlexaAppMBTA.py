@@ -195,7 +195,7 @@ def find_next_bus(intent, session):
                             "Please try again. "
                 reprompt_text = "I'm not sure what your route I D is. " \
                             "Please tell me your stop I D and route number again, "
-            
+
     except Exception as e:
         print (e)
         error = True
@@ -255,7 +255,7 @@ def save_stop(intent, session):
                     ':stop_id': myStopID
                 }
             )
-            if response.status_code == 200:
+            if response.get('ResponseMetadata').get('HTTPStatusCode') == 200:
                 speech_output = str(myStopID) + " is saved as your preferred stop."
                 reprompt_text = None
             else:
