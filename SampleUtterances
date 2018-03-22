@@ -39,3 +39,11 @@ findNextBusIntent when will the next {routeId} bus will arrive at {StopId}
 findNextBusIntent when will the next {routeId} bus will arrive at stop {StopId}
 findNextBusIntent when the next {routeId} bus will reach at stop {StopId}
 findNextBusIntent when the next {routeId} bus at stop {StopId}
+savePreferredStopIntent my stop id is {StopId}
+savePreferredStopIntent my stop is {StopId}
+savePreferredStopIntent my stop number is {StopId}
+savePreferredStopIntent my stop id is {StopId
+savePreferredStopIntent my stop number is {StopId}
+savePreferredStopIntent stop {StopId}
+savePreferredStopIntent stop id {StopId}
+savePreferredStopIntent my stop {StopId}
