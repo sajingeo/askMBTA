@@ -9,6 +9,8 @@ import requests
 import time
 import datetime, dateutil.parser
 import pytz
+import boto3
+
 
 def lambda_handler(event, context):
     """ Route the incoming request based on type (LaunchRequest, IntentRequest,
@@ -141,12 +143,34 @@ def find_next_bus(intent, session):
     card_title = "Boston T-time"
     session_attributes = {}
     error = False
+
+    dynamodb = boto3.resource('dynamodb', region_name='us-east-1')
+    table = dynamodb.Table('askMBTA')
+
     try:
         if 'StopId' in intent['slots']:
             myStopID = int(intent['slots']['StopId']['value'])
             if 'routeId' in intent['slots']:
+
+                # create table entry if unique userID else update it
+                response = table.get_item(
+                    Key={
+                        'userID': session['user']['userID']
+                    }
+                )
+                if (response == ''):
+                    table.put_item(
+                        Item={
+                            'userID': session['user']['userID'],
+                            'home': "none",
+                            'work': "none",
+                            'stopid' : myStopID,
+                            'trainStopId':"none",
+                            'route': "none"
+                        }
+                    )
+
                 myRouteId = intent['slots']['routeId']['value']
-                
                 speech_output = seach_mbta(myStopID,myRouteId)
                 if (speech_output == -1):
                     error = True
@@ -165,7 +189,8 @@ def find_next_bus(intent, session):
                             "Please try again. "
             reprompt_text = "I'm not sure what your stop I D is. " \
                             "Please tell me your stop I D and route number. "
-    except:
+    except Exception as e:
+        print (e)
         error = True
         speech_output = "Sorry I didn't get that. " \
                         "Please try again. " \
@@ -252,7 +277,7 @@ def seach_mbta(stop_id,route_id_str):
         elif (route_id_str == "24/27"):
             route_id = 2427
 
-    API_KEY = "xxxxxxxxxxxxxxxxxxxxxxxx"
+    API_KEY = "a3964f7cb88b4afe88428ea96bcceab8"
     payload = {'api_key':API_KEY,'route': route_id, 'stop' : stop_id,'format':'json'}
     url_p_route = "https://api-v3.mbta.com/predictions"
     # print (payload)
