@@ -157,13 +157,13 @@ def find_next_bus(intent, session):
                 # create table entry if unique userID else update it
                 response = table.get_item(
                     Key={
-                        'userID': session['user']['userID']
+                        'userID': session['user']['userId']
                     }
                 )
-                if (response == ''):
+                if response.get("Item") is None:
                     table.put_item(
                         Item={
-                            'userID': session['user']['userID'],
+                            'userID': session['user']['userId'],
                             'home': "none",
                             'work': "none",
                             'stopid' : myStopID,
