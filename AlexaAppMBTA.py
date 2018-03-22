@@ -252,8 +252,8 @@ def seach_mbta(stop_id,route_id_str):
         elif (route_id_str == "24/27"):
             route_id = 2427
 
-    API_KEY = "xxxxxxxxxxxxxxxxxxxxxx"
-    payload = {'api_key':API_KEY,'route':route_id,'format':'json'}
+    API_KEY = "xxxxxxxxxxxxxxxxxxxxxxxx"
+    payload = {'api_key':API_KEY,'route': route_id, 'stop' : stop_id,'format':'json'}
     url_p_route = "https://api-v3.mbta.com/predictions"
     # print (payload)
     r = requests.get(url_p_route, params=payload)
@@ -279,7 +279,7 @@ def seach_mbta(stop_id,route_id_str):
             print ("time not found")
             return -1
     
-        outString = "The next " + route_id_str + "bus will arrive at stop " + stop_id + " in " + str(minutesForNextBus) + " Minutes "
+        outString = "The next " + route_id_str + " bus will arrive at stop " + stop_id + " in " + str(minutesForNextBus) + " Minutes "
         # print (outString)
         return outString
     except:
