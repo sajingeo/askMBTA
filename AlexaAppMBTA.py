@@ -7,7 +7,7 @@ Sample "my stop id is one four one nine and stop id is sixty nine"
 from __future__ import print_function
 import requests
 import time
-import datetime
+import datetime, dateutil.parser
 import pytz
 
 def lambda_handler(event, context):
@@ -254,7 +254,7 @@ def seach_mbta(stop_id,route_id_str):
 
     API_KEY = "xxxxxxxxxxxxxxxxxxxxxx"
     payload = {'api_key':API_KEY,'route':route_id,'format':'json'}
-    url_p_route = "http://realtime.mbta.com/developer/api/v2/predictionsbyroute"
+    url_p_route = "https://api-v3.mbta.com/predictions"
     # print (payload)
     r = requests.get(url_p_route, params=payload)
     res = r.json() ## josonfy the string
@@ -265,19 +265,11 @@ def seach_mbta(stop_id,route_id_str):
 
     # print (res)
     try:
-        timeNow = datetime.datetime.now(pytz.utc)
-        for direction in res["direction"]:
-            for trip in direction["trip"]:
-                for stopOutbound in trip["stop"]:
-                    outTime = datetime.datetime.fromtimestamp(int(stopOutbound["sch_arr_dt"]),pytz.UTC)
-                    if (stopOutbound["stop_id"] == stop_id)and(foundStop == False)and(outTime >= timeNow):
-                        foundStop = True
-                        tripDirection = trip["trip_headsign"]
-                        outTimeFound = datetime.datetime.fromtimestamp(int(stopOutbound["sch_arr_dt"]),pytz.UTC)
-        if foundStop == False:
-            print ("stop not found")
-            return -1
-    
+        for predicton in res["data"]:
+            attributes = predicton['attributes']
+            departure_time = attributes['departure_time']
+            outTimeFound = dateutil.parser.parse(departure_time)
+            break
         timeNow = datetime.datetime.now(pytz.utc)
     
         if (outTimeFound >= timeNow):
@@ -287,7 +279,7 @@ def seach_mbta(stop_id,route_id_str):
             print ("time not found")
             return -1
     
-        outString = "The next " + route_id_str +" bus towards "+ tripDirection + " will arrive at stop " +stop_id+ " in "+ str(minutesForNextBus) + " Minutes "
+        outString = "The next " + route_id_str + "bus will arrive at stop " + stop_id + " in " + str(minutesForNextBus) + " Minutes "
         # print (outString)
         return outString
     except:
