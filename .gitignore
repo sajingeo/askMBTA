@@ -63,3 +63,8 @@ target/
 
 #MAC
 .DS_Store
+
+#idea
+.idea/
+venv/
+venv1/
