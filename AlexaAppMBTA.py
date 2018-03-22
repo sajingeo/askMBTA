@@ -336,7 +336,7 @@ def seach_mbta(stop_id,route_id_str):
         elif (route_id_str == "24/27"):
             route_id = 2427
 
-    API_KEY = "a3964f7cb88b4afe88428ea96bcceab8"
+    API_KEY = "xxxxxxxxxxxxxxxxxxxx"
     payload = {'api_key':API_KEY,'route': route_id, 'stop' : stop_id,'format':'json'}
     url_p_route = "https://api-v3.mbta.com/predictions"
     # print (payload)
