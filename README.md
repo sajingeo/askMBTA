@@ -2,14 +2,14 @@
 A python script that runs on Amazon AWS Lambda, to help out all Boston commuters. 
 
 ##Credits
-@Antalls
-@Melvin-Kanasseril-Bose
+* @Antall https://github.com/Antall
+* @Melvin-Kanasseril-Bose https://github.com/Melvin-Kanasseril-Bose
 
 #New Features
-* Convert MBTA V3 api (DONE)
-* Add support for saving user stop / train station (TODO)
-* Add head sign from (trip id)  (TODO)
-* 
+- [x] Convert MBTA V3 api
+- [x] Add support for saving user stop
+- [ ] Added support for saving train stations
+- [ ] Add head sign from (trip id)
 
 ##Credits ICON/Graphics
 Bus by Pierre-Luc Auclair from the Noun Project
