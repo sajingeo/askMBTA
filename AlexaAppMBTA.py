@@ -149,7 +149,7 @@ def find_next_bus(intent, session):
     session_attributes = {}
     error = False
     try:
-        if 'StopId' in intent['slots']:
+        if intent['slots']['StopId'].get('value') is not None:
             myStopID = int(intent['slots']['StopId']['value'])
             if 'routeId' in intent['slots']:
                 myRouteId = intent['slots']['routeId']['value']
