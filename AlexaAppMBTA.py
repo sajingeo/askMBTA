@@ -68,6 +68,8 @@ def on_intent(intent_request, session):
     # Dispatch to your skill's intent handlers
     if intent_name == "findNextBusIntent":
         return find_next_bus(intent,session)
+    if intent_name == "savePreferredStopIntent":
+        return save_stop(intent, session)
     elif intent_name == "AMAZON.HelpIntent":
         return get_help_response()
     elif ((intent_name == "AMAZON.StartOverIntent") or (intent_name == "AMAZON.RepeatIntent")):
@@ -160,11 +162,11 @@ def find_next_bus(intent, session):
                 reprompt_text = "I'm not sure what your route I D is. " \
                             "Please tell me your stop I D and route number again, "
         else:
-            error = True
+            error = False
             speech_output = "I'm not sure what your stop I D is. " \
-                            "Please try again. "
+                            "Say my stop is followed by your stop number to save your preferred stop "
             reprompt_text = "I'm not sure what your stop I D is. " \
-                            "Please tell me your stop I D and route number. "
+                            "Say my stop is followed by your stop number to save your preferred stop "
     except:
         error = True
         speech_output = "Sorry I didn't get that. " \
@@ -202,6 +204,45 @@ def build_speechlet_response(title, output, reprompt_text, card_text, should_end
         },
         'shouldEndSession': should_end_session
     }
+
+def save_stop(intent, session):
+    """ sets stop id into session"""
+
+    card_title = "Boston T-time"
+    session_attributes = {}
+    error = False
+    try:
+        if 'StopId' in intent['slots']:
+            myStopID = int(intent['slots']['StopId']['value'])
+
+            # save to dynamodb
+            speech_output = str(myStopID) + " is saved as your preferred stop."
+            reprompt_text = None
+
+        else:
+            error = True
+            speech_output = "I'm not sure what your stop I D is. " \
+                            "Please try again. "
+            reprompt_text = "I'm not sure what your stop I D is. " \
+                            "Please tell me your stop I D and route number. "
+    except:
+        error = True
+        speech_output = "Sorry I didn't get that. " \
+                        "Please try again. " \
+                        "You can say my stop I.D. is one four one nine"
+        reprompt_text = "I'm not sure what your stop I D is. " \
+                        "Please tell me your stop I D , " \
+                        "for example, my stop I D is one four one nine."
+    card_text = speech_output + "Find out your stop id at https://mbtasearch.herokuapp.com/ "
+
+    if (error == True):  ## do not close the seesion if there was an error in the request
+        should_end_session = False
+    else:
+        should_end_session = True
+
+    return build_response(session_attributes, build_speechlet_response(
+        card_title, speech_output, reprompt_text, card_text, should_end_session))
+
 
 def seach_mbta(stop_id,route_id_str):
     try:
