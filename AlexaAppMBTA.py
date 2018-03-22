@@ -11,6 +11,9 @@ import datetime, dateutil.parser
 import pytz
 import boto3
 
+dynamodb = boto3.resource('dynamodb', region_name='us-east-1')
+table = dynamodb.Table('askMBTA')
+
 
 def lambda_handler(event, context):
     """ Route the incoming request based on type (LaunchRequest, IntentRequest,
@@ -145,33 +148,10 @@ def find_next_bus(intent, session):
     card_title = "Boston T-time"
     session_attributes = {}
     error = False
-
-    dynamodb = boto3.resource('dynamodb', region_name='us-east-1')
-    table = dynamodb.Table('askMBTA')
-
     try:
         if 'StopId' in intent['slots']:
             myStopID = int(intent['slots']['StopId']['value'])
             if 'routeId' in intent['slots']:
-
-                # create table entry if unique userID else update it
-                response = table.get_item(
-                    Key={
-                        'userID': session['user']['userId']
-                    }
-                )
-                if response.get("Item") is None:
-                    table.put_item(
-                        Item={
-                            'userID': session['user']['userId'],
-                            'home': "none",
-                            'work': "none",
-                            'stopid' : myStopID,
-                            'trainStopId':"none",
-                            'route': "none"
-                        }
-                    )
-
                 myRouteId = intent['slots']['routeId']['value']
                 speech_output = seach_mbta(myStopID,myRouteId)
                 if (speech_output == -1):
@@ -186,11 +166,36 @@ def find_next_bus(intent, session):
                 reprompt_text = "I'm not sure what your route I D is. " \
                             "Please tell me your stop I D and route number again, "
         else:
-            error = False
-            speech_output = "I'm not sure what your stop I D is. " \
-                            "Say my stop is followed by your stop number to save your preferred stop "
-            reprompt_text = "I'm not sure what your stop I D is. " \
-                            "Say my stop is followed by your stop number to save your preferred stop "
+            if 'routeId' in intent['slots']:
+                myRouteId = intent['slots']['routeId']['value']
+                # create table entry if unique userID else update it
+                response = table.get_item(
+                    Key={
+                        'userID': session['user']['userId']
+                    }
+                )
+                if response.get('Item') is not None:
+                    stopid = response.get('Item').get('stopid')
+                    if stopid is not None:
+                        speech_output = seach_mbta(stopid, myRouteId)
+                        if (speech_output == -1):
+                            error = True
+                            speech_output = "There was an error with the request, please try another stop id and route."
+
+                        reprompt_text = None
+                else:
+                    error = False
+                    speech_output = "I'm not sure what your stop I D is. " \
+                                    "Say my stop is followed by your stop number to save your preferred stop "
+                    reprompt_text = "I'm not sure what your stop I D is. " \
+                                    "Say my stop is followed by your stop number to save your preferred stop "
+            else:
+                error = True
+                speech_output = "I'm not sure what your route number is. " \
+                            "Please try again. "
+                reprompt_text = "I'm not sure what your route I D is. " \
+                            "Please tell me your stop I D and route number again, "
+            
     except Exception as e:
         print (e)
         error = True
@@ -241,9 +246,22 @@ def save_stop(intent, session):
             myStopID = int(intent['slots']['StopId']['value'])
 
             # save to dynamodb
-            speech_output = str(myStopID) + " is saved as your preferred stop."
-            reprompt_text = None
-
+            response = table.update_item(
+                Key={
+                    'userID': session['user']['userId']
+                },
+                UpdateExpression= 'SET stopid = :stop_id',
+                ExpressionAttributeValues={
+                    ':stop_id': myStopID
+                }
+            )
+            if response.status_code == 200:
+                speech_output = str(myStopID) + " is saved as your preferred stop."
+                reprompt_text = None
+            else:
+                speech_output = "Error saving " + str(myStopID) + " as your preferred stop."
+                reprompt_text = None
+                error = True
         else:
             error = True
             speech_output = "I'm not sure what your stop I D is. " \
