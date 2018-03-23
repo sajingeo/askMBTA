@@ -102,11 +102,14 @@ def get_welcome_response():
     card_title = "Boston T-time"
     speech_output = "Welcome to the boston T. time. " \
                     "Please tell me your stop I D and route number, " \
-                    "For example my stop I D is one four one nine and route number is sixty nine. You can also say ask boston t. time when is the next 69 bus at stop one four one nine. "
+                    "For example my stop I D is one four one nine and route number is sixty nine. You can also say ask boston t. time when is the next 69 bus at stop one four one nine. "\
+                    "You can also save your prefered stop by saying tell boston t. time my stop is one four one nine."
+
     card_text = "Welcome to the Boston T-time" \
                 "Please tell me your stop ID, and route number. " \
                 "For example \"my stop ID is 1419 and route number is 69\". You can also say \" ask boston T-time when is the next 69 bus at stop 1419." \
-                "You can also find the STOP ID at https://mbtasearch.herokuapp.com/. "
+                "You can also find the STOP ID at https://mbtasearch.herokuapp.com/. "\
+                "You can now save your stop by saying \"My stop is 1419\" "
     # If the user either does not reply to the welcome message or says something
     # that is not understood, they will be prompted again with this text.
     reprompt_text = "Please tell me your stop I. D. and route number. " \
@@ -125,7 +128,7 @@ def get_help_response():
                     "To use the app you should know the STOP I D and Route Number. " \
                     "The route number is usually the bus number, and stop I D can be found on the M. B. T. A. Bus Stop Sign. " \
                     "The stop I D can also be found online from the M. B. T. A. website. " \
-                    "Can you please tell me your stop I D and bus number ? "
+                    "Can you please tell me your stop I D ? "
     card_text = "With the Boston T-time app you can find when the next bus would arrive at your stop.  " \
                 "To use the app you should know the STOP ID and Route Number. " \
                 "The route number is usually the bus number, and stop ID can be found on the MBTA Bus Stop Sign. " \
@@ -137,7 +140,7 @@ def get_help_response():
                     "To use the app you should know the STOP I D and Route Number. " \
                     "The route number is usually the bus number, and stop I D can be found on the M. B. T. A. Bus Stop Sign. " \
                     "You can check the alexa app for a link, to lookup the stop ID." \
-                    "Can you please tell me your stop I D and bus number ?"
+                    "Can you please tell me your stop I D ?"
     should_end_session = False
     return build_response(session_attributes, build_speechlet_response(
         card_title, speech_output, reprompt_text, card_text, should_end_session))
@@ -163,12 +166,12 @@ def find_next_bus(intent, session):
                 error = True
                 speech_output = "I'm not sure what your route number is. " \
                             "Please try again. "
-                reprompt_text = "I'm not sure what your route I D is. " \
+                reprompt_text = "I'm not sure what your route number is. " \
                             "Please tell me your stop I D and route number again, "
         else:
             if 'routeId' in intent['slots']:
                 myRouteId = intent['slots']['routeId']['value']
-                # create table entry if unique userID else update it
+                # look up the stop using the user ID
                 response = table.get_item(
                     Key={
                         'userID': session['user']['userId']
@@ -184,16 +187,16 @@ def find_next_bus(intent, session):
 
                         reprompt_text = None
                 else:
-                    error = False
+                    error = True
                     speech_output = "I'm not sure what your stop I D is. " \
-                                    "Say my stop is followed by your stop number to save your preferred stop "
+                                    "Say my stop is. Followed by your stop number to save your preferred stop "
                     reprompt_text = "I'm not sure what your stop I D is. " \
                                     "Say my stop is followed by your stop number to save your preferred stop "
             else:
                 error = True
                 speech_output = "I'm not sure what your route number is. " \
                             "Please try again. "
-                reprompt_text = "I'm not sure what your route I D is. " \
+                reprompt_text = "I'm not sure what your route number is. " \
                             "Please tell me your stop I D and route number again, "
 
     except Exception as e:
@@ -204,7 +207,8 @@ def find_next_bus(intent, session):
                         "You can say my stop I.D. is one four one nine, and route number is sixty nine. "
         reprompt_text = "I'm not sure what your stop I D and Route number is. " \
                         "Please tell me your stop I D and route number, " \
-                        "for example, my stop I D is one four one nine. and route number is 69."
+                        "for example, my stop I D is one four one nine. and route number is 69."\
+                        "You can also say when is the next 69 bus, if you saved your stop."
     card_text = speech_output +"Find out your stop id at https://mbtasearch.herokuapp.com/ "
     
     if (error == True):  ## do not close the seesion if there was an error in the request
