@@ -292,6 +292,7 @@ def save_stop(intent, session):
 
 
 def seach_mbta(stop_id,route_id_str):
+    is_train = False
     try:
         route_id = int (route_id_str)
     except:
@@ -339,8 +340,17 @@ def seach_mbta(stop_id,route_id_str):
             route_id = "70A"
         elif (route_id_str == "24/27"):
             route_id = 2427
+        elif (route_id_str.lower().find("red") == 0):
+            is_train = True
+            route_id = "Red"
+        elif (route_id_str.lower().find("blue") == 0):
+            is_train = True
+            route_id = "Blue"
+        elif (route_id_str.lower().find("orange") == 0):
+            is_train = True
+            route_id = "Orange"
 
-    API_KEY = "xxxxxxxxxxxxxxxxxxxx"
+    API_KEY = "xxxxxxx"
     payload = {'api_key':API_KEY,'route': route_id, 'stop' : stop_id,'format':'json'}
     url_p_route = "https://api-v3.mbta.com/predictions"
     # print (payload)
@@ -349,7 +359,11 @@ def seach_mbta(stop_id,route_id_str):
     #print (res) ## this is for logging and should not released!!
     #function returns -1 if there is an error
     foundStop = False
-    stop_id  = str(stop_id)
+
+    url_p_stop_name = "https://api-v3.mbta.com/stops"
+    payload_stop_name = {'api_key': API_KEY, 'id': stop_id, 'format': 'json'}
+    r_name = requests.get(url_p_stop_name, params=payload_stop_name)
+    res_name = r_name.json()
 
     # print (res)
     try:
@@ -359,6 +373,9 @@ def seach_mbta(stop_id,route_id_str):
             outTimeFound = dateutil.parser.parse(departure_time)
             break
         timeNow = datetime.datetime.now(pytz.utc)
+
+        for stop_id_info in res_name["data"]:
+            stop_name = stop_id_info['attributes']['name']
     
         if (outTimeFound >= timeNow):
             time_diff = outTimeFound - timeNow
@@ -366,9 +383,14 @@ def seach_mbta(stop_id,route_id_str):
         else:
             print ("time not found")
             return -1
-    
-        outString = "The next " + route_id_str + " bus will arrive at stop " + stop_id + " in " + str(minutesForNextBus) + " Minutes "
-        # print (outString)
+
+        if (is_train):
+            outString = "The next " + route_id + " line train will arrive at stop " + stop_name + " in " + str(
+                minutesForNextBus) + " Minutes "
+        else:
+            outString = "The next " + route_id_str + " bus will arrive at stop " + stop_name.replace(
+                "@", "and").replace(" St", "") + " in " + str(minutesForNextBus) + " Minutes "
+        # print(outString)
         return outString
     except:
         print ("some other error")
